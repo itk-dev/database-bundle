@@ -1,0 +1,6 @@
+services:
+    itk_dev.database.command.dump:
+        class: ItkDev\DatabaseBundle\Command\DatabaseDumpCommand
+        tags:
+            - { name: console.command }
+

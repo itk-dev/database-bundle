@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="dokk1">
+    <description>PHP CodeSniffer configuration for os2display/core-bundle</description>
+
+    <file>ItkDevDatabaseBundle.php</file>
+    <file>Command</file>
+
+    <!-- Show progress -->
+    <arg value="p"/>
+
+    <rule ref="PSR2"/>
+</ruleset>

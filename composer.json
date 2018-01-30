@@ -1,0 +1,20 @@
+{
+    "name": "itk-dev/database-bundle",
+    "description": "A Symfony bundle with useful database stuff",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Mikkel Ricky",
+            "email": "rimi@aarhus.dk"
+        }
+    ],
+    "require": {
+        "symfony/symfony": "^2.8 || ^3.0",
+        "doctrine/dbal": "^2.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "ItkDev\\DatabaseBundle\\": ""
+        }
+    }
+}

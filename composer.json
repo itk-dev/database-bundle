@@ -2,6 +2,7 @@
     "name": "itk-dev/database-bundle",
     "description": "A Symfony bundle with useful database stuff",
     "type": "library",
+    "license": "MIT",
     "authors": [
         {
             "name": "Mikkel Ricky",

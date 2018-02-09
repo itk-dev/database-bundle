@@ -8,5 +8,5 @@
     <!-- Show progress -->
     <arg value="p"/>
 
-    <rule ref="PSR2"/>
+    <rule ref="vendor/squizlabs/php_codesniffer/src/Standards/PSR2"/>
 </ruleset>

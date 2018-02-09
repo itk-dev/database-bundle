@@ -2,6 +2,9 @@
 
 namespace ItkDev\DatabaseBundle\Command;
 
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+
 /**
  * Class DatabaseCliCommand.
  */
@@ -9,29 +12,37 @@ class DatabaseCliCommand extends AbstractDatabaseCommand
 {
     protected function configure()
     {
+        parent::configure();
         $this->setName('itk-dev:database:cli')
             ->setDescription('Open database.');
     }
 
-    protected function doStuff()
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $connection = $this->getContainer()->get('doctrine.dbal.default_connection');
-        if ('mysql' !== $connection->getDatabasePlatform()->getName()) {
-            throw new \RuntimeException('Not a mysql database platform');
+        $params = $this->getParams($input);
+        $driver = $params['driver'];
+
+        switch ($driver) {
+            case 'pdo_mysql':
+                $cmd = sprintf(
+                    'mysql --host=%s --port=%s --user=%s --password=%s %s',
+                    escapeshellarg($params['host']),
+                    escapeshellarg($params['port']),
+                    escapeshellarg($params['user']),
+                    escapeshellarg($params['password']),
+                    escapeshellarg($params['dbname'])
+                );
+                break;
+            case 'pdo_sqlite':
+                $cmd = sprintf(
+                    'sqlite3 %s',
+                    escapeshellarg($params['path'])
+                );
+                break;
+            default:
+                throw new \RuntimeException('Unknown driver: ' . $driver);
         }
 
-        $cmd = sprintf(
-            'mysql --host=%s --user=%s --password=%s %s',
-            escapeshellarg($this->host),
-            escapeshellarg($this->username),
-            escapeshellarg($this->password),
-            escapeshellarg($this->database)
-        );
-
-        $pipes = [];
-        $process = proc_open($cmd, [0 => STDIN, 1 => STDOUT, 2 => STDERR], $pipes);
-        $status = proc_get_status($process);
-        $exitCode = proc_close($process);
-        exit($status['running'] ? $exitCode : $status['exitcode']);
+        $this->executeCommand($cmd);
     }
 }

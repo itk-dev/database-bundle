@@ -2,6 +2,9 @@
 
 namespace ItkDev\DatabaseBundle\Command;
 
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+
 /**
  * Class DatabaseDumpCommand.
  */
@@ -9,24 +12,35 @@ class DatabaseDumpCommand extends AbstractDatabaseCommand
 {
     protected function configure()
     {
+        parent::configure();
         $this->setName('itk-dev:database:dump')
             ->setDescription('Dump database.');
     }
-
-    protected function doStuff()
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $connection = $this->getContainer()->get('doctrine.dbal.default_connection');
-        if ('mysql' !== $connection->getDatabasePlatform()->getName()) {
-            throw new \RuntimeException('Not a mysql database platform');
-        }
+        $params = $this->getParams($input);
+        $driver = $params['driver'];
 
-        $cmd = sprintf(
-            'mysqldump --host=%s --user=%s --password=%s %s',
-            escapeshellarg($this->host),
-            escapeshellarg($this->username),
-            escapeshellarg($this->password),
-            escapeshellarg($this->database)
-        );
+        switch ($driver) {
+            case 'pdo_mysql':
+                $cmd = sprintf(
+                    'mysqldump --host=%s --port=%s --user=%s --password=%s %s',
+                    escapeshellarg($params['host']),
+                    escapeshellarg($params['port']),
+                    escapeshellarg($params['user']),
+                    escapeshellarg($params['password']),
+                    escapeshellarg($params['dbname'])
+                );
+                break;
+            case 'pdo_sqlite':
+                $cmd = sprintf(
+                    'sqlite3 %s .dump',
+                    escapeshellarg($params['path'])
+                );
+                break;
+            default:
+                throw new \RuntimeException('Unknown driver: ' . $driver);
+        }
 
         $result = $this->runCommand($cmd);
 

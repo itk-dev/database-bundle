@@ -4,49 +4,26 @@ namespace ItkDev\DatabaseBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class AbstractDatabaseCommand extends ContainerAwareCommand
 {
-    /** @var OutputInterface */
-    protected $output;
-
-    /** @var InputInterface */
-    protected $input;
-
-    /** @var \Doctrine\DBAL\Driver\Connection */
-    protected $connection;
-
-    /** @var string */
-    protected $host;
-
-    /** @var string */
-    protected $database;
-
-    /** @var string */
-    protected $username;
-
-    /** @var string */
-    protected $password;
-
-    abstract protected function doStuff();
-
-    /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
-     * @return null|int|void
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function configure()
     {
-        $this->output = $output;
-        $parameters = $this->getContainer()->getParameterBag();
-        $this->host = $parameters->get('database_host');
-        $this->database = $parameters->get('database_name');
-        $this->username = $parameters->get('database_user');
-        $this->password = $parameters->get('database_password');
+        $this->addOption('connection', null, InputOption::VALUE_REQUIRED, 'The connection name to use');
+    }
 
-        $this->doStuff();
+    protected function getParams(InputInterface $input)
+    {
+        $name = $input->getOption('connection');
+        $connection = $this->getContainer()->get('doctrine')->getConnection($name);
+        $params = $connection->getParams();
+        if ($params['driver'] === 'pdo_mysql' && !isset($params['port'])) {
+            $params['port'] = 3306;
+        }
+
+        return $params;
     }
 
     /**
@@ -67,5 +44,19 @@ abstract class AbstractDatabaseCommand extends ContainerAwareCommand
           'output' => $output,
           'exit_status' => $exit_status,
         ];
+    }
+
+    /**
+     * Executes a command.
+     *
+     * @param $command
+     */
+    protected function executeCommand($command)
+    {
+        $pipes = [];
+        $process = proc_open($command, [0 => STDIN, 1 => STDOUT, 2 => STDERR], $pipes);
+        $status = proc_get_status($process);
+        $exitCode = proc_close($process);
+        exit($status['running'] ? $exitCode : $status['exitcode']);
     }
 }

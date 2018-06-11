@@ -7,7 +7,7 @@ A Symfony bundle with useful database stuff.
 Require the bundle with `composer`:
 
 ```sh
-composer require itk-dev/database-bundle "^1.1"
+composer require itk-dev/database-bundle "^1.2"
 ```
 
 Enable the bundle:

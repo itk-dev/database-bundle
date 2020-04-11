@@ -49,5 +49,7 @@ class DatabaseDumpCommand extends AbstractDatabaseCommand
         }
 
         echo implode(PHP_EOL, $result['output']), PHP_EOL;
+
+        return 0;
     }
 }

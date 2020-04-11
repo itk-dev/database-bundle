@@ -44,5 +44,7 @@ class DatabaseCliCommand extends AbstractDatabaseCommand
         }
 
         $this->executeCommand($cmd);
+
+        return 0;
     }
 }

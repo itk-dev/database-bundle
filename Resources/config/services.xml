@@ -6,9 +6,11 @@
 
     <services>
         <service id="itk_dev_database.command.database_cli_command" class="ItkDev\DatabaseBundle\Command\DatabaseCliCommand">
+            <argument type="service" id="doctrine" />
             <tag name="console.command" />
         </service>
         <service id="itk_dev_database.command.database_dump_command" class="ItkDev\DatabaseBundle\Command\DatabaseDumpCommand">
+            <argument type="service" id="doctrine" />
             <tag name="console.command" />
         </service>
     </services>

@@ -29,7 +29,7 @@ public function registerBundles()
 
 ```php
 <?php
-// Symfony 4.
+// Symfony 4 and 5.
 // config/bundles.php
 
 return [

@@ -2,13 +2,23 @@
 
 namespace ItkDev\DatabaseBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 
-abstract class AbstractDatabaseCommand extends ContainerAwareCommand
+abstract class AbstractDatabaseCommand extends Command
 {
+    /** @var ManagerRegistry  */
+    protected $registry;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct();
+        $this->registry = $registry;
+    }
+
     protected function configure()
     {
         $this->addOption('connection', null, InputOption::VALUE_REQUIRED, 'The connection name to use');
@@ -17,7 +27,7 @@ abstract class AbstractDatabaseCommand extends ContainerAwareCommand
     protected function getParams(InputInterface $input)
     {
         $name = $input->getOption('connection');
-        $connection = $this->getContainer()->get('doctrine')->getConnection($name);
+        $connection = $this->registry->getConnection($name);
         $params = $connection->getParams();
         if ($params['driver'] === 'pdo_mysql' && !isset($params['port'])) {
             $params['port'] = 3306;
